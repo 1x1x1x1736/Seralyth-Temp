@@ -212,5 +212,11 @@ namespace SeralythTemp.Mods
                 previousTeleportTrigger = ControllerInputPoller.TriggerFloat(XRNode.RightHand) > 0.5f;
             }
         }
+    
+    public static void Speedboost()
+        {
+            GTPlayer.Instance.maxJumpSpeed = 10f;
+            GTPlayer.Instance.jumpMultiplier = 10f;
+        }
     }
 }

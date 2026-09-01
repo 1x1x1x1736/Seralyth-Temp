@@ -173,7 +173,7 @@ namespace SeralythTemp.Menu
                     }
                 }.AddComponent<Text>();
                 text.font = currentFont;
-                text.text = PluginInfo.Name + " <color=grey>[</color><color=white>" + (pageNumber + 1).ToString() + "</color><color=grey>]</color>";
+                text.text = PluginInfo.Name + " <color=grey>[</color><color=white>" + (pageNumber + 1).ToString() + "</color><color=grey>]</color>" + (searching ? " <color=grey>|</color> Search: " + searchText : "");
                 text.fontSize = 1;
                 text.color = textColors[0];
                 text.supportRichText = true;
@@ -211,6 +211,15 @@ namespace SeralythTemp.Menu
                     component2.sizeDelta = new Vector2(0.28f, 0.02f);
                     component2.position = new Vector3(0.06f, 0f, 0.135f);
                     component2.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+                }
+
+            // Search Keyboard
+                if (currentCategory == SearchCategory)
+                {
+                    CreateSearchDisplay();
+                    CreateKeyboard();
+                    CreateSearchResults();
+                    return;
                 }
 
             // Buttons
@@ -331,6 +340,223 @@ namespace SeralythTemp.Menu
                     ButtonInfo[] activeButtons = buttons[currentCategory].Skip(pageNumber * buttonsPerPage).Take(buttonsPerPage).ToArray();
                     for (int i = 0; i < activeButtons.Length; i++)
                         CreateButton(i * 0.1f, activeButtons[i]);
+        }
+
+        public static ButtonInfo[] GetCurrentButtons()
+        {
+            if (searching)
+            {
+                if (string.IsNullOrEmpty(searchText))
+                    return buttons
+                        .SelectMany(list => list)
+                        .GroupBy(button => button.buttonText)
+                        .Select(group => group.First())
+                        .ToArray();
+                return buttons
+                    .SelectMany(list => list)
+                    .Where(button => button.buttonText.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .GroupBy(button => button.buttonText)
+                    .Select(group => group.First())
+                    .ToArray();
+            }
+
+            if (currentCategory < 0 || currentCategory >= buttons.Length)
+                return new ButtonInfo[0];
+            return buttons[currentCategory];
+        }
+
+        public static void CreateSearchDisplay()
+        {
+            Text searchDisplay = new GameObject
+            {
+                transform =
+                {
+                    parent = canvasObject.transform
+                }
+            }.AddComponent<Text>();
+            searchDisplay.font = currentFont;
+            searchDisplay.fontSize = 1;
+            searchDisplay.text = "Search: " + (searchText.Length > 0 ? searchText + " <color=grey>(" + GetCurrentButtons().Length + " found)</color>" : "_");
+            searchDisplay.color = textColors[0];
+            searchDisplay.supportRichText = true;
+            searchDisplay.alignment = TextAnchor.MiddleCenter;
+            searchDisplay.resizeTextForBestFit = true;
+            searchDisplay.resizeTextMinSize = 0;
+            RectTransform component = searchDisplay.GetComponent<RectTransform>();
+            component.localPosition = Vector3.zero;
+            component.sizeDelta = new Vector2(0.28f, 0.04f);
+            component.localPosition = new Vector3(0.064f, 0f, 0.28f);
+            component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+        }
+
+        public static void CreateKeyboard()
+        {
+            string[][] rows = new string[][]
+            {   
+                new string[] { "1", "2","3", "4", "5", "6", "7", "8", "9", "0" },
+                new string[] { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" },
+                new string[] { "A", "S", "D", "F", "G", "H", "J", "K", "L" },
+                new string[] { "Z", "X", "C", "V", "B", "N", "M" }
+            };
+
+            float rowZ = 0.28f;
+            for (int r = 0; r < rows.Length; r++)
+            {
+                string[] row = rows[r];
+                float stepY = 0.078f;
+                float keyWidth = 0.065f;
+                float startY = 0.35f;
+                for (int i = 0; i < row.Length; i++)
+                    CreateKey(row[i], row[i], keyWidth, startY - i * stepY, rowZ);
+                rowZ -= 0.075f;
+            }
+
+            // Bottom Row
+            float bottomZ = rowZ;
+            CreateKey("Backspace", "<-", 0.09f, 0.36f, bottomZ);
+            CreateKey("Clear", "CLR", 0.08f, 0.235f, bottomZ);
+            CreateKey("Space", "SPACE", 0.34f, -0.02f, bottomZ);
+            CreateKey("Cancel", "EXIT", 0.09f, -0.36f, bottomZ);
+        }
+
+        public static void CreateKey(string key, string label, float keyWidth, float yPos, float zPos)
+        {
+            GameObject keyObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            if (!UnityInput.Current.GetKey(keyboardButton))
+                keyObject.layer = 2;
+            Destroy(keyObject.GetComponent<Rigidbody>());
+            keyObject.GetComponent<BoxCollider>().isTrigger = true;
+            keyObject.transform.parent = menu.transform;
+            keyObject.transform.rotation = Quaternion.identity;
+            keyObject.transform.localScale = new Vector3(0.09f, keyWidth, 0.04f);
+            keyObject.transform.localPosition = new Vector3(0.56f, yPos, zPos);
+            keyObject.GetComponent<Renderer>().material.color = buttonColors[0].colors[0].color;
+            keyObject.AddComponent<Classes.Button>().relatedText = "Key:" + key;
+
+            Text keyText = new GameObject
+            {
+                transform =
+                {
+                    parent = canvasObject.transform
+                }
+            }.AddComponent<Text>();
+            keyText.font = currentFont;
+            keyText.fontSize = 1;
+            keyText.text = label;
+            keyText.color = textColors[0];
+            keyText.alignment = TextAnchor.MiddleCenter;
+            keyText.resizeTextForBestFit = true;
+            keyText.resizeTextMinSize = 0;
+            RectTransform component = keyText.GetComponent<RectTransform>();
+            component.localPosition = Vector3.zero;
+            component.sizeDelta = new Vector2(keyWidth * 0.7f, 0.018f);
+            component.localPosition = new Vector3(0.064f, yPos * 0.3f, zPos * 0.3825f);
+            component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+        }
+
+        public static void CreateSearchResults()
+        {
+            if (string.IsNullOrEmpty(searchText))
+                return;
+
+            searchResultButtons.Clear();
+            ButtonInfo[] results = GetCurrentButtons().Take(6).ToArray();
+            float zPos = -0.04f;
+            for (int i = 0; i < results.Length; i++)
+            {
+                ButtonInfo result = results[i];
+                searchResultButtons[result.buttonText] = result;
+
+                GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                if (!UnityInput.Current.GetKey(keyboardButton))
+                    gameObject.layer = 2;
+                Destroy(gameObject.GetComponent<Rigidbody>());
+                gameObject.GetComponent<BoxCollider>().isTrigger = true;
+                gameObject.transform.parent = menu.transform;
+                gameObject.transform.rotation = Quaternion.identity;
+                gameObject.transform.localScale = new Vector3(0.09f, 0.9f, 0.06f);
+                gameObject.transform.localPosition = new Vector3(0.56f, 0f, zPos);
+                gameObject.GetComponent<Renderer>().material.color = result.enabled ? buttonColors[1].colors[0].color : buttonColors[0].colors[0].color;
+                gameObject.AddComponent<Classes.Button>().relatedText = "Result:" + result.buttonText;
+
+                Text text = new GameObject
+                {
+                    transform =
+                    {
+                        parent = canvasObject.transform
+                    }
+                }.AddComponent<Text>();
+                text.font = currentFont;
+                text.text = result.buttonText;
+                text.supportRichText = true;
+                text.fontSize = 1;
+                text.color = result.enabled ? textColors[1] : textColors[0];
+                text.alignment = TextAnchor.MiddleCenter;
+                text.fontStyle = FontStyle.Italic;
+                text.resizeTextForBestFit = true;
+                text.resizeTextMinSize = 0;
+                RectTransform component = text.GetComponent<RectTransform>();
+                component.localPosition = Vector3.zero;
+                component.sizeDelta = new Vector2(0.2f, 0.03f);
+                component.localPosition = new Vector3(0.064f, 0f, zPos * 0.3825f);
+                component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+                zPos -= 0.08f;
+            }
+        }
+
+        public static void HandleSearchKey(string key)
+        {
+            if (key == "Space")
+                searchText += " ";
+            else if (key == "Backspace")
+            {
+                if (searchText.Length > 0)
+                    searchText = searchText.Substring(0, searchText.Length - 1);
+            }
+            else if (key == "Clear")
+                searchText = "";
+            else if (key == "Cancel")
+            {
+                searching = false;
+                searchText = "";
+                currentCategory = 0;
+                pageNumber = 0;
+            }
+            else
+                searchText += key;
+
+            RecreateMenu();
+        }
+
+        public static void ToggleModDirect(ButtonInfo target)
+        {
+            if (target == null)
+                return;
+
+            if (target.isTogglable)
+            {
+                target.enabled = !target.enabled;
+                if (target.enabled)
+                {
+                    NotifiLib.SendNotification("<color=grey>[</color><color=green>ENABLE</color><color=grey>]</color> " + target.toolTip);
+                    if (target.enableMethod != null)
+                        try { target.enableMethod.Invoke(); } catch { }
+                }
+                else
+                {
+                    NotifiLib.SendNotification("<color=grey>[</color><color=red>DISABLE</color><color=grey>]</color> " + target.toolTip);
+                    if (target.disableMethod != null)
+                        try { target.disableMethod.Invoke(); } catch { }
+                }
+            }
+            else
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>ENABLE</color><color=grey>]</color> " + target.toolTip);
+                if (target.method != null)
+                    try { target.method.Invoke(); } catch { }
+            }
+
+            RecreateMenu();
         }
 
         public static void CreateButton(float offset, ButtonInfo method)
@@ -477,6 +703,45 @@ namespace SeralythTemp.Menu
 
         public static void Toggle(string buttonText)
         {
+            try
+            {
+                ToggleInner(buttonText);
+            }
+            catch (Exception exc)
+            {
+                Debug.LogError(string.Format("{0} // Error toggling {1} at {2}: {3}", PluginInfo.Name, buttonText, exc.StackTrace, exc.Message));
+            }
+        }
+
+        private static void ToggleInner(string buttonText)
+        {
+            // Search Keyboard Input
+            if (buttonText != null && buttonText.StartsWith("Key:"))
+            {
+                HandleSearchKey(buttonText.Substring(4));
+                return;
+            }
+            if (buttonText != null && buttonText.StartsWith("Result:"))
+            {
+                string name = buttonText.Substring(7);
+                ButtonInfo target = searchResultButtons.ContainsKey(name) ? searchResultButtons[name] : GetIndex(name);
+                if (target != null)
+                    ToggleModDirect(target);
+                return;
+            }
+
+            if (searching && currentCategory == SearchCategory)
+            {
+                searching = false;
+                searchText = "";
+                currentCategory = 0;
+                pageNumber = 0;
+                RecreateMenu();
+                return;
+            }
+
+            if (currentCategory < 0 || currentCategory >= buttons.Length)
+                currentCategory = 0;
             int lastPage = ((buttons[currentCategory].Length + buttonsPerPage - 1) / buttonsPerPage) - 1;
             if (buttonText == "PreviousPage")
             {
@@ -730,6 +995,10 @@ namespace SeralythTemp.Menu
 
         // Data
         public static int pageNumber = 0;
+        public const int SearchCategory = 13;
+        public static bool searching = false;
+        public static string searchText = "";
+        public static Dictionary<string, ButtonInfo> searchResultButtons = new Dictionary<string, ButtonInfo>();
         public static int _currentCategory;
         public static int currentCategory
         {
