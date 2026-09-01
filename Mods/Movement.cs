@@ -14,7 +14,8 @@ namespace SeralythTemp.Mods
         {
             if (ControllerInputPoller.instance.rightControllerPrimaryButton)
             {
-                GTPlayer.Instance.transform.position += GorillaTagger.Instance.headCollider.transform.forward * Time.deltaTime * Settings.Movement.flySpeed;
+                GTPlayer.Instance.transform.position += GorillaTagger.Instance.headCollider.transform.forward *
+                                                        Time.deltaTime * Settings.Movement.flySpeed;
                 GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
             }
         }
@@ -105,11 +106,14 @@ namespace SeralythTemp.Mods
                 speed /= 2;
 
             if (W)
-                GorillaTagger.Instance.rigidbody.transform.position += parentTransform.forward * (Time.deltaTime * speed);
+                GorillaTagger.Instance.rigidbody.transform.position +=
+                    parentTransform.forward * (Time.deltaTime * speed);
             if (S)
-                GorillaTagger.Instance.rigidbody.transform.position += parentTransform.forward * (Time.deltaTime * -speed);
+                GorillaTagger.Instance.rigidbody.transform.position +=
+                    parentTransform.forward * (Time.deltaTime * -speed);
             if (A)
-                GorillaTagger.Instance.rigidbody.transform.position += parentTransform.right * (Time.deltaTime * -speed);
+                GorillaTagger.Instance.rigidbody.transform.position +=
+                    parentTransform.right * (Time.deltaTime * -speed);
             if (D)
                 GorillaTagger.Instance.rigidbody.transform.position += parentTransform.right * (Time.deltaTime * speed);
             if (Space)
@@ -196,6 +200,7 @@ namespace SeralythTemp.Mods
         }
 
         public static bool previousTeleportTrigger;
+
         public static void TeleportGun()
         {
             if (ControllerInputPoller.instance.rightGrab)
@@ -205,18 +210,13 @@ namespace SeralythTemp.Mods
 
                 if (ControllerInputPoller.TriggerFloat(XRNode.RightHand) > 0.5f && !previousTeleportTrigger)
                 {
-                    GTPlayer.Instance.TeleportTo(NewPointer.transform.position + Vector3.up, GTPlayer.Instance.transform.rotation);
+                    GTPlayer.Instance.TeleportTo(NewPointer.transform.position + Vector3.up,
+                        GTPlayer.Instance.transform.rotation);
                     GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
                 }
 
                 previousTeleportTrigger = ControllerInputPoller.TriggerFloat(XRNode.RightHand) > 0.5f;
             }
-        }
-    
-    public static void Speedboost()
-        {
-            GTPlayer.Instance.maxJumpSpeed = 10f;
-            GTPlayer.Instance.jumpMultiplier = 10f;
         }
     }
 }
