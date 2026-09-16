@@ -8,6 +8,9 @@ namespace SeralythTemp.Classes
 	{
 		public string relatedText;
 
+		public bool incremental;
+		public bool positive;
+
 		public static float buttonCooldown = 0f;
 		
 		public void OnTriggerEnter(Collider collider)
@@ -17,7 +20,11 @@ namespace SeralythTemp.Classes
                 buttonCooldown = Time.time + 0.2f;
                 GorillaTagger.Instance.StartVibration(rightHanded, GorillaTagger.Instance.tagHapticStrength / 2f, GorillaTagger.Instance.tagHapticDuration / 2f);
                 VRRig.LocalRig.PlayHandTapLocal(8, rightHanded, 0.4f);
-				Toggle(this.relatedText);
+
+                if (incremental)
+                    ToggleIncremental(this.relatedText, positive);
+                else
+                    Toggle(this.relatedText);
             }
 		}
 	}

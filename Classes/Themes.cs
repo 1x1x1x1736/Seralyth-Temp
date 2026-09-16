@@ -103,6 +103,11 @@ namespace SeralythTemp.Classes
             ApplyTheme((currentThemeIndex + 1) % themes.Length);
         }
 
+        public static void PrevTheme()
+        {
+            ApplyTheme((currentThemeIndex - 1 + themes.Length) % themes.Length);
+        }
+
         public static void LoadSavedTheme()
         {
             if (HarmonyPatches.ThemeIndex != null)
@@ -117,7 +122,9 @@ namespace SeralythTemp.Classes
                 {
                     if (category[i].buttonText.StartsWith("Theme:"))
                     {
-                        category[i].buttonText = "Theme: " + themes[currentThemeIndex].name;
+                        string themeName = themes[currentThemeIndex].name;
+                        category[i].buttonText = "Theme: " + themeName;
+                        category[i].overlapText = "Theme: <color=grey>[</color><color=green>" + themeName + "</color><color=grey>]</color>";
                         return;
                     }
                 }

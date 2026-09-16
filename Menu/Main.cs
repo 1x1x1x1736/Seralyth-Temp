@@ -573,6 +573,13 @@ namespace SeralythTemp.Menu
             gameObject.transform.localPosition = new Vector3(0.56f, 0f, 0.28f - offset);
             gameObject.AddComponent<Classes.Button>().relatedText = method.buttonText;
 
+            if (method.incremental)
+            {
+                gameObject.transform.localScale = new Vector3(0.09f, 0.646f, 0.08f);
+                RenderIncrementalButton(true, offset, method);
+                RenderIncrementalButton(false, offset, method);
+            }
+
             ColorChanger colorChanger = gameObject.AddComponent<ColorChanger>();
             colorChanger.colors = method.enabled ? buttonColors[1] : buttonColors[0];
 
@@ -603,6 +610,84 @@ namespace SeralythTemp.Menu
             component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
         }
 
+        private static void RenderIncrementalButton(bool increment, float offset, ButtonInfo method)
+        {
+            GameObject buttonObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            if (!UnityInput.Current.GetKey(keyboardButton))
+                buttonObject.layer = 2;
+
+            buttonObject.GetComponent<BoxCollider>().isTrigger = true;
+            buttonObject.transform.parent = menu.transform;
+            buttonObject.transform.rotation = Quaternion.identity;
+
+            buttonObject.transform.localScale = new Vector3(0.09f, 0.102f, 0.08f);
+            buttonObject.transform.localPosition = new Vector3(0.56f, 0.399f, 0.28f - offset);
+
+            Classes.Button button = buttonObject.AddComponent<Classes.Button>();
+            button.relatedText = method.buttonText;
+            button.incremental = true;
+            button.positive = increment;
+
+            if (increment)
+                buttonObject.transform.localPosition = new Vector3(buttonObject.transform.localPosition.x, -buttonObject.transform.localPosition.y, buttonObject.transform.localPosition.z);
+
+            ColorChanger colorChanger = buttonObject.AddComponent<ColorChanger>();
+            colorChanger.colors = buttonColors[0];
+
+            RenderIncrementalText(increment, offset);
+        }
+
+        private static void RenderIncrementalText(bool increment, float offset)
+        {
+            Text buttonText = new GameObject
+            {
+                transform =
+                {
+                    parent = canvasObject.transform
+                }
+            }.AddComponent<Text>();
+            buttonText.font = currentFont;
+            buttonText.text = increment ? "+" : "-";
+            buttonText.supportRichText = true;
+            buttonText.fontSize = 1;
+            buttonText.color = textColors[1];
+            buttonText.alignment = TextAnchor.MiddleCenter;
+            buttonText.fontStyle = FontStyle.Italic;
+            buttonText.resizeTextForBestFit = true;
+            buttonText.resizeTextMinSize = 0;
+            RectTransform textTransform = buttonText.GetComponent<RectTransform>();
+            textTransform.localPosition = Vector3.zero;
+            textTransform.sizeDelta = new Vector2(.2f, .03f);
+            textTransform.localPosition = new Vector3(.064f, increment ? -0.12f : 0.12f, .111f - offset / 2.6f);
+            textTransform.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
+        }
+
+        public static void ToggleIncremental(string buttonText, bool increment)
+        {
+            ButtonInfo target = GetIndex(buttonText);
+            if (target == null)
+            {
+                Debug.LogError(buttonText + " does not exist");
+                RecreateMenu();
+                return;
+            }
+
+            if (increment)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>INCREMENT</color><color=grey>]</color> " + target.toolTip);
+                if (target.enableMethod != null)
+                    try { target.enableMethod.Invoke(); } catch { }
+            }
+            else
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=red>DECREMENT</color><color=grey>]</color> " + target.toolTip);
+                if (target.disableMethod != null)
+                    try { target.disableMethod.Invoke(); } catch { }
+            }
+
+            RecreateMenu();
+        }
+
         public static void RecreateMenu()
         {
             if (menu != null)
@@ -622,7 +707,9 @@ namespace SeralythTemp.Menu
             {
                 if (settingsButtons[i].buttonText.StartsWith("Theme:"))
                 {
-                    settingsButtons[i].buttonText = "Theme: " + Classes.ThemeChanger.themes[Classes.ThemeChanger.currentThemeIndex].name;
+                    string themeName = Classes.ThemeChanger.themes[Classes.ThemeChanger.currentThemeIndex].name;
+                    settingsButtons[i].buttonText = "Theme: " + themeName;
+                    settingsButtons[i].overlapText = "Theme: <color=grey>[</color><color=green>" + themeName + "</color><color=grey>]</color>";
                     break;
                 }
             }

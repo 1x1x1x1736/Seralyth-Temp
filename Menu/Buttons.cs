@@ -43,7 +43,7 @@ namespace SeralythTemp.Menu
                 new ButtonInfo { buttonText = "Notifications", enableMethod =() => disableNotifications = false, disableMethod =() => disableNotifications = true, enabled = !disableNotifications, toolTip = "Toggles the notifications."},
                 new ButtonInfo { buttonText = "FPS Counter", enableMethod =() => fpsCounter = true, disableMethod =() => fpsCounter = false, enabled = fpsCounter, toolTip = "Toggles the FPS counter."},
                 new ButtonInfo { buttonText = "Disconnect Button", enableMethod =() => disconnectButton = true, disableMethod =() => disconnectButton = false, enabled = disconnectButton, toolTip = "Toggles the disconnect button."},
-                new ButtonInfo { buttonText = "Theme: Default", method =() => Classes.ThemeChanger.NextTheme(), isTogglable = false, toolTip = "Cycles through available themes."},
+                new ButtonInfo { buttonText = "Theme: Default", overlapText = "Theme: <color=grey>[</color><color=green>Default</color><color=grey>]</color>", method =() => Classes.ThemeChanger.NextTheme(), enableMethod =() => Classes.ThemeChanger.NextTheme(), disableMethod =() => Classes.ThemeChanger.PrevTheme(), incremental = true, isTogglable = false, toolTip = "Cycles through available themes."},
                 new ButtonInfo { buttonText = "Save Config", method =() => Classes.ThemeChanger.SaveConfig(), isTogglable = false, toolTip = "Saves your current theme and mod configuration."},
                 new ButtonInfo { buttonText = "Load Config", method =() => Classes.ThemeChanger.LoadConfig(), isTogglable = false, toolTip = "Loads your saved theme and mod configuration."},
             },
