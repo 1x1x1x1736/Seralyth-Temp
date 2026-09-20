@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seralyth Temp", "Seralyth temp.csproj", "{0E1A7B60-2A46-47C6-847A-D6BDD6594116}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seralyth Temp Legal", "Seralyth temp Legal.csproj", "{71C2A535-DF99-495B-BA59-9255E51B3E54}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0E1A7B60-2A46-47C6-847A-D6BDD6594116} = {0E1A7B60-2A46-47C6-847A-D6BDD6594116}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

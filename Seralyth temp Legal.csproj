@@ -5,7 +5,7 @@
     <AssemblyName>Seralyth temp Legal</AssemblyName>
     <RootNamespace>SeralythTemp</RootNamespace>
     <DefineConstants>$(DefineConstants);LEGAL</DefineConstants>
-    <OutputPath>bin\Legal\</OutputPath>
+    <SiblingProject>Seralyth temp.csproj</SiblingProject>
   </PropertyGroup>
 
   <PropertyGroup>
