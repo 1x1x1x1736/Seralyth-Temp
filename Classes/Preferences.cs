@@ -10,7 +10,7 @@ namespace SeralythTemp.Classes
 {
     public class Preferences
     {
-        private static string FilePath => Path.Combine("SeralythTemp", "SeralythTemp.json");
+        private static string FilePath => Path.Combine(PluginInfo.BaseDirectory, "SeralythTemp.json");
 
         public static void Save()
         {
@@ -22,8 +22,8 @@ namespace SeralythTemp.Classes
         {
             try
             {
-                if (!Directory.Exists("SeralythTemp"))
-                    Directory.CreateDirectory("SeralythTemp");
+                if (!Directory.Exists(PluginInfo.BaseDirectory))
+                    Directory.CreateDirectory(PluginInfo.BaseDirectory);
 
                 var data = new Dictionary<string, object>();
                 data["themeIndex"] = ThemeChanger.currentThemeIndex;

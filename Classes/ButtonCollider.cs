@@ -19,7 +19,8 @@ namespace SeralythTemp.Classes
 			{
                 buttonCooldown = Time.time + 0.2f;
                 GorillaTagger.Instance.StartVibration(rightHanded, GorillaTagger.Instance.tagHapticStrength / 2f, GorillaTagger.Instance.tagHapticDuration / 2f);
-                VRRig.LocalRig.PlayHandTapLocal(ButtonSound, rightHanded, 0.4f);
+                if (!relatedText.StartsWith("Key:"))
+                    VRRig.LocalRig.PlayHandTapLocal(ButtonSound, rightHanded, 0.4f);
 
                 if (incremental)
                     ToggleIncremental(this.relatedText, positive);

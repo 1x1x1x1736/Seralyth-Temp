@@ -2,7 +2,20 @@
 
   <PropertyGroup>
 	  <TargetFramework>netstandard2.1</TargetFramework>
-	  <SiblingProject>Seralyth temp Legal.csproj</SiblingProject>
+	  <RootNamespace>SeralythTemp</RootNamespace>
+	  <AssemblyName>Seralyth Temp</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Legal' or '$(Configuration)' == 'LegalDebug'">
+	  <AssemblyName>Seralyth Temp Legal</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Legal'">
+	  <DefineConstants>$(DefineConstants);LEGAL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'LegalDebug'">
+	  <DefineConstants>$(DefineConstants);LEGAL;LEGAL_DEBUG</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>

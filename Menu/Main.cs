@@ -516,6 +516,8 @@ namespace SeralythTemp.Menu
 
         public static void HandleSearchKey(string key)
         {
+            VRRig.LocalRig.PlayHandTapLocal(66, rightHanded, 0.4f);
+
             if (key == "Space")
                 searchText += " ";
             else if (key == "Backspace")
@@ -731,7 +733,7 @@ namespace SeralythTemp.Menu
         }
 
         public static int change16 = 1;
-        public static int ButtonSound = 8;
+        public static int ButtonSound = 67;
 
         public static void CycleButtonSound()
         {
@@ -760,8 +762,10 @@ namespace SeralythTemp.Menu
                 ButtonSound = 50;
             else if (index == 3)
                 ButtonSound = 203;
-            else
+            else if (index == 2)
                 ButtonSound = 8;
+            else
+                ButtonSound = 67;
             UpdateButtonSoundText();
         }
 
@@ -786,7 +790,7 @@ namespace SeralythTemp.Menu
             }
             if (change16 == 6)
             {
-                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: Cayon Bridge</color>"); // this sounds the best tbh
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: Cayon Bridge</color>");
             }
 
             VRRig.LocalRig.PlayHandTapLocal(ButtonSound, rightHanded, 0.4f);

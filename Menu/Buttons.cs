@@ -20,8 +20,8 @@ namespace SeralythTemp.Menu
          *   new ButtonInfo { buttonText = "Platforms", method =() => Movement.Platforms(), toolTip = "Spawns platforms on your hands when pressing grip."},
          * 
          * Legal Build:
-         *   Set PluginInfo.LegalBuild to true when building, and the menu is compiled as "Seralyth Temp Legal".
-         *   In the legal build, buttons that are not marked as legal are hidden and never run.
+         *   Build with the "Legal" or "LegalDebug" configuration so the menu compiles as "Seralyth Temp Legal" (LEGAL / LEGAL_DEBUG defines).
+         *   The legal build uses its own preferences folder (SeralythTemp/Legal) and hides anything not marked legal.
          *   Put legal = true on any button you want to keep in the legal build:
          *   new ButtonInfo { buttonText = "Disconnect", method =() => NetworkSystem.Instance.ReturnToSinglePlayer(), isTogglable = false, legal = true, toolTip = "Disconnects you from the room."},
          */
@@ -50,7 +50,7 @@ namespace SeralythTemp.Menu
                 new ButtonInfo { buttonText = "FPS Counter", enableMethod =() => fpsCounter = true, disableMethod =() => fpsCounter = false, enabled = fpsCounter, toolTip = "Toggles the FPS counter.", legal = true,},
                 new ButtonInfo { buttonText = "Disconnect Button", enableMethod =() => disconnectButton = true, disableMethod =() => disconnectButton = false, enabled = disconnectButton, toolTip = "Toggles the disconnect button.", legal = true,},
                 new ButtonInfo { buttonText = "Theme: Default", overlapText = "Theme: <color=grey>[</color><color=green>Default</color><color=grey>]</color>", method =() => Classes.ThemeChanger.NextTheme(), enableMethod =() => Classes.ThemeChanger.NextTheme(), disableMethod =() => Classes.ThemeChanger.PrevTheme(), incremental = true, isTogglable = false, toolTip = "Cycles through available themes.", legal = true,},
-                new ButtonInfo { buttonText = "Button Sound: Default", overlapText = "Button Sound: <color=grey>[</color><color=green>Default</color><color=grey>]</color>", method =() => CycleButtonSound(), enableMethod =() => CycleButtonSound(), disableMethod =() => PrevButtonSound(), incremental = true, isTogglable = false, toolTip = "Cycles the sound played when touching buttons."},
+                new ButtonInfo { buttonText = "Button Sound: Default", overlapText = "Button Sound: <color=grey>[</color><color=green>Default</color><color=grey>]</color>", method =() => CycleButtonSound(), enableMethod =() => CycleButtonSound(), disableMethod =() => PrevButtonSound(), incremental = true, isTogglable = false, toolTip = "Cycles the sound played when touching buttons.", legal = true},
                 new ButtonInfo { buttonText = "Save Config", method =() => Classes.ThemeChanger.SaveConfig(), isTogglable = false, toolTip = "Saves your current theme and mod configuration.", legal = true,},
                 new ButtonInfo { buttonText = "Load Config", method =() => Classes.ThemeChanger.LoadConfig(), isTogglable = false, toolTip = "Loads your saved theme and mod configuration.", legal = true,},
             },
