@@ -20,7 +20,7 @@ namespace SeralythTemp
 
         public void OnPlayerSpawned()
         {
-            Classes.ThemeChanger.LoadSavedTheme();
+            Classes.Preferences.TryLoad();
             Patches.PatchHandler.PatchAll();
         }
     }

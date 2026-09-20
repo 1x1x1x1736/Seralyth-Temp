@@ -12,6 +12,7 @@ namespace SeralythTemp.Classes
         public bool enabled = false;
         public bool isTogglable = true;
         public bool incremental = false;
+        public bool legal = false;
         public string toolTip = "This button doesn't have a tooltip/tutorial.";
     }
 }

@@ -95,6 +95,7 @@ namespace SeralythTemp.Classes
 
             UpdateButtonText();
             Menu.Main.RecreateMenu();
+            Preferences.AutoSave();
             NotifiLib.SendNotification("<color=grey>[</color><color=cyan>THEME</color><color=grey>]</color> " + theme.name);
         }
 
@@ -133,62 +134,12 @@ namespace SeralythTemp.Classes
 
         public static void SaveConfig()
         {
-            var data = new Dictionary<string, object>();
-            data["themeIndex"] = currentThemeIndex;
-
-            var mods = new Dictionary<string, bool>();
-            foreach (ButtonInfo[] category in Buttons.buttons)
-            {
-                foreach (ButtonInfo button in category)
-                {
-                    mods[button.buttonText] = button.enabled;
-                }
-            }
-            data["mods"] = mods;
-
-            string json = JsonConvert.SerializeObject(data);
-            HarmonyPatches.SaveData.Value = json;
-            NotifiLib.SendNotification("<color=grey>[</color><color=green>SAVED</color><color=grey>]</color> Config saved.");
+            Preferences.Save();
         }
 
         public static void LoadConfig()
         {
-            string json = HarmonyPatches.SaveData.Value;
-            if (string.IsNullOrEmpty(json))
-            {
-                NotifiLib.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> No saved config found.");
-                return;
-            }
-
-            try
-            {
-                var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-
-                if (data.ContainsKey("themeIndex"))
-                {
-                    int themeIdx = Convert.ToInt32(data["themeIndex"]);
-                    ApplyTheme(themeIdx);
-                }
-
-                if (data.ContainsKey("mods"))
-                {
-                    var mods = JsonConvert.DeserializeObject<Dictionary<string, bool>>(data["mods"].ToString());
-                    foreach (ButtonInfo[] category in Buttons.buttons)
-                    {
-                        foreach (ButtonInfo button in category)
-                        {
-                            if (mods.ContainsKey(button.buttonText))
-                                button.enabled = mods[button.buttonText];
-                        }
-                    }
-                }
-
-                NotifiLib.SendNotification("<color=grey>[</color><color=green>LOADED</color><color=grey>]</color> Config loaded.");
-            }
-            catch
-            {
-                NotifiLib.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> Failed to load config.");
-            }
+            Preferences.Load();
         }
     }
 }

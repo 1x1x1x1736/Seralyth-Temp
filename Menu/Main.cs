@@ -115,7 +115,7 @@ namespace SeralythTemp.Menu
                     // Execute Enabled Mods
                         foreach (ButtonInfo button in buttons
                             .SelectMany(list => list)
-                            .Where(button => button.enabled && button.method != null))
+                            .Where(button => button.enabled && button.method != null && (!legalMode || button.legal)))
                         {
                             try
                             {
@@ -337,7 +337,7 @@ namespace SeralythTemp.Menu
                     component.rotation = Quaternion.Euler(new Vector3(180f, 90f, 90f));
 
                 // Mod Buttons
-                    ButtonInfo[] activeButtons = buttons[currentCategory].Skip(pageNumber * buttonsPerPage).Take(buttonsPerPage).ToArray();
+                    ButtonInfo[] activeButtons = GetCategoryButtons(currentCategory).Skip(pageNumber * buttonsPerPage).Take(buttonsPerPage).ToArray();
                     for (int i = 0; i < activeButtons.Length; i++)
                         CreateButton(i * 0.1f, activeButtons[i]);
         }
@@ -349,20 +349,30 @@ namespace SeralythTemp.Menu
                 if (string.IsNullOrEmpty(searchText))
                     return buttons
                         .SelectMany(list => list)
+                        .Where(button => !legalMode || button.legal)
                         .GroupBy(button => button.buttonText)
                         .Select(group => group.First())
                         .ToArray();
                 return buttons
                     .SelectMany(list => list)
                     .Where(button => button.buttonText.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .Where(button => !legalMode || button.legal)
                     .GroupBy(button => button.buttonText)
                     .Select(group => group.First())
                     .ToArray();
             }
 
-            if (currentCategory < 0 || currentCategory >= buttons.Length)
+            return GetCategoryButtons(currentCategory);
+        }
+
+        public static ButtonInfo[] GetCategoryButtons(int category)
+        {
+            if (category < 0 || category >= buttons.Length)
                 return new ButtonInfo[0];
-            return buttons[currentCategory];
+            ButtonInfo[] categoryButtons = buttons[category];
+            if (legalMode)
+                return categoryButtons.Where(button => button.legal).ToArray();
+            return categoryButtons;
         }
 
         public static void CreateSearchDisplay()
@@ -461,7 +471,7 @@ namespace SeralythTemp.Menu
 
             searchResultButtons.Clear();
             ButtonInfo[] results = GetCurrentButtons().Take(6).ToArray();
-            float zPos = -0.04f;
+            float zPos = -0.12f;
             for (int i = 0; i < results.Length; i++)
             {
                 ButtonInfo result = results[i];
@@ -533,6 +543,9 @@ namespace SeralythTemp.Menu
             if (target == null)
                 return;
 
+            if (legalMode && !target.legal)
+                return;
+
             if (target.isTogglable)
             {
                 target.enabled = !target.enabled;
@@ -556,6 +569,7 @@ namespace SeralythTemp.Menu
                     try { target.method.Invoke(); } catch { }
             }
 
+            Preferences.AutoSave();
             RecreateMenu();
         }
 
@@ -685,6 +699,7 @@ namespace SeralythTemp.Menu
                     try { target.disableMethod.Invoke(); } catch { }
             }
 
+            Preferences.AutoSave();
             RecreateMenu();
         }
 
@@ -711,6 +726,100 @@ namespace SeralythTemp.Menu
                     settingsButtons[i].buttonText = "Theme: " + themeName;
                     settingsButtons[i].overlapText = "Theme: <color=grey>[</color><color=green>" + themeName + "</color><color=grey>]</color>";
                     break;
+                }
+            }
+        }
+
+        public static int change16 = 1;
+        public static int ButtonSound = 8;
+
+        public static void CycleButtonSound()
+        {
+            change16++;
+            if (change16 > 6)
+                change16 = 1;
+            ApplyButtonSound();
+        }
+
+        public static void PrevButtonSound()
+        {
+            change16--;
+            if (change16 < 1)
+                change16 = 6;
+            ApplyButtonSound();
+        }
+
+        public static void SetButtonSound(int index)
+        {
+            change16 = index;
+            if (index == 6)
+                ButtonSound = 114;
+            else if (index == 5)
+                ButtonSound = 66;
+            else if (index == 4)
+                ButtonSound = 50;
+            else if (index == 3)
+                ButtonSound = 203;
+            else
+                ButtonSound = 8;
+            UpdateButtonSoundText();
+        }
+
+        private static void ApplyButtonSound()
+        {
+            SetButtonSound(change16);
+            if (change16 == 2)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: Stump</color>");
+            }
+            if (change16 == 3)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: AK47</color>");
+            }
+            if (change16 == 4)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: Glass</color>");
+            }
+            if (change16 == 5)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: KeyBoard</color>");
+            }
+            if (change16 == 6)
+            {
+                NotifiLib.SendNotification("<color=grey>[</color><color=green>BUTTON SOUND</color><color=grey>]</color> Button Sound: Cayon Bridge</color>"); // this sounds the best tbh
+            }
+
+            VRRig.LocalRig.PlayHandTapLocal(ButtonSound, rightHanded, 0.4f);
+            Preferences.AutoSave();
+            RecreateMenu();
+        }
+
+        private static string ButtonSoundName()
+        {
+            switch (change16)
+            {
+                case 2: return "Stump";
+                case 3: return "AK47";
+                case 4: return "Glass";
+                case 5: return "KeyBoard";
+                case 6: return "Cayon Bridge";
+                default: return "Default";
+            }
+        }
+
+        private static void UpdateButtonSoundText()
+        {
+            string soundName = ButtonSoundName();
+            foreach (ButtonInfo[] category in buttons)
+            {
+                for (int i = 0; i < category.Length; i++)
+                {
+                    if (category[i].buttonText.StartsWith("Button Sound:"))
+                    {
+                        category[i].buttonText = "Button Sound: " + soundName;
+                        category[i].overlapText = "Button Sound: <color=grey>[</color><color=green>" + soundName + "</color><color=grey>]</color>";
+                        return;
+                    }
                 }
             }
         }
@@ -829,7 +938,7 @@ namespace SeralythTemp.Menu
 
             if (currentCategory < 0 || currentCategory >= buttons.Length)
                 currentCategory = 0;
-            int lastPage = ((buttons[currentCategory].Length + buttonsPerPage - 1) / buttonsPerPage) - 1;
+            int lastPage = ((GetCategoryButtons(currentCategory).Length + buttonsPerPage - 1) / buttonsPerPage) - 1;
             if (buttonText == "PreviousPage")
             {
                 pageNumber--;
@@ -869,6 +978,8 @@ namespace SeralythTemp.Menu
                             if (target.method != null)
                                 try { target.method.Invoke(); } catch { }
                         }
+
+                        Preferences.AutoSave();
                     }
                     else
                         Debug.LogError(buttonText + " does not exist");

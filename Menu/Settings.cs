@@ -44,6 +44,7 @@ namespace SeralythTemp
 
         public static Font currentFont = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font ?? Resources.GetBuiltinResource(typeof(Font), "LegacyRuntime.ttf") as Font;
 
+        public static readonly bool legalMode = PluginInfo.LegalBuild;
         public static bool fpsCounter = true;
         public static bool disconnectButton = true;
         public static bool rightHanded;
