@@ -75,6 +75,8 @@ namespace SeralythTemp.Menu
                 new ButtonInfo { buttonText = "Teleport Gun", method =() => Movement.TeleportGun(), toolTip = "Teleports you to wherever your pointer is when pressing trigger."},
                 new ButtonInfo { buttonText = "WASD Fly", method =() => Movement.WASDFly(), disableMethod =() => { Movement.lastPosition = Vector3.zero; GorillaTagger.Instance.rigidbody.useGravity = true; }, toolTip = "Hold right click to look around. WASD to move, Space/Ctrl for up/down, Shift/Alt for speed, Arrow keys to turn."},
                 new ButtonInfo { buttonText = "Disable Stationary WASD Fly", toolTip = "When enabled, WASD fly stays in place when you stop moving."},
+                new ButtonInfo { buttonText = "Noclip", method =() => Movement.Noclip(), disableMethod =() => { if (Movement.noclip) { Movement.noclip = false; Movement.UpdateClipColliders(true); } }, toolTip = "Makes you go through objects when holding trigger."},
+                new ButtonInfo { buttonText = "Ghost Monke", method =() => Movement.Ghost(), disableMethod =() => Movement.EnableRig(), toolTip = "Keeps your rig still when holding A."},
                
             },
 

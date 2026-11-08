@@ -199,6 +199,54 @@ namespace SeralythTemp.Mods
             }
         }
 
+        public static bool noclip;
+
+        public static void UpdateClipColliders(bool enabled)
+        {
+            foreach (MeshCollider v in Resources.FindObjectsOfTypeAll<MeshCollider>())
+                v.enabled = enabled;
+        }
+
+        public static void Noclip()
+        {
+            bool trigger = ControllerInputPoller.TriggerFloat(UnityEngine.XR.XRNode.RightHand) > 0.5f;
+            if (trigger)
+            {
+                if (!noclip)
+                {
+                    noclip = true;
+                    UpdateClipColliders(false);
+                }
+            }
+            else
+            {
+                if (noclip)
+                {
+                    noclip = false;
+                    UpdateClipColliders(true);
+                }
+            }
+        }
+
+        private static bool ghostMonke;
+        private static bool lastHit;
+
+        public static void Ghost()
+        {
+            bool hit = ControllerInputPoller.instance.rightControllerPrimaryButton;
+            VRRig.LocalRig.enabled = !ghostMonke;
+            if (hit && !lastHit)
+                ghostMonke = !ghostMonke;
+            lastHit = hit;
+        }
+
+        public static void EnableRig()
+        {
+            VRRig.LocalRig.enabled = true;
+            ghostMonke = false;
+            lastHit = false;
+        }
+
         public static bool previousTeleportTrigger;
 
         public static void TeleportGun()
